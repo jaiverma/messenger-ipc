@@ -20,6 +20,7 @@ public class QACEService extends Service {
     NotificationManager mNM;
     final Messenger mMessenger = new Messenger(new IncomingHandler());
     final int mNotificationId = 0xdeadbeef;
+    Model model;
     int randNum;
     Random randGen;
     public QACEService() {
@@ -29,6 +30,7 @@ public class QACEService extends Service {
     public void onCreate() {
 //        mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
         showNotification("onCreate");
+        model = new Model(this, Model.MODEL.PONG);
         randGen = new Random();
     }
 

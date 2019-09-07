@@ -25,4 +25,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    // This adds the SNPE SDK as a project dependency
+    implementation(name: 'snpe-release', ext:'aar')
 }
