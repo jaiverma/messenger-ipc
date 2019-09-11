@@ -56,7 +56,35 @@ public class Model extends ContextWrapper {
         }
     }
 
+    public float[] zNormalise(float[] f)
+    {
+        double sum = 0.0f, standardDeviation = 0.0f;
+        int length = f.length;
+        for(float num : f) {
+            sum += num;
+        }
+        double mean = sum/length;
+        for(float num: f) {
+            standardDeviation += Math.pow(num - mean, 2);
+        }
+        standardDeviation = Math.sqrt(standardDeviation/length);
+
+        for (int i = 0; i < f.length; i++) {
+            f[i] = (float)((f[i] - mean) / standardDeviation);
+        }
+        return f;
+    }
+
     public FloatTensor createFloatTensor(float[] data) {
+        data = zNormalise(data);
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < data.length; i++) {
+            sb.append(data[i]);
+            sb.append(", ");
+        }
+        sb.append("]");
+        Log.i("qace-snpe", sb.toString());
         FloatTensor tensor = network.createFloatTensor(1, data.length, 1, 1);
         tensor.write(data, 0, data.length);
         return tensor;
