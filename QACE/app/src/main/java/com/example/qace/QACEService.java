@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class QACEService extends Service {
-    public static final int MSG_SAY_HELLO = 1;
+    public static final int MSG_INFERENCE = 1;
     NotificationManager mNM;
     final Messenger mMessenger = new Messenger(new IncomingHandler());
     final int mNotificationId = 0xdeadbeef;
@@ -84,12 +84,17 @@ public class QACEService extends Service {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case MSG_SAY_HELLO:
+                case MSG_INFERENCE:
                     Messenger replyTo = msg.replyTo;
                     Bundle b = (Bundle)msg.obj;
-                    float[] f = b.getFloatArray("data-from-qace");
-                    Message reply = Message.obtain(null, MSG_SAY_HELLO, f.length, 0);
-                    Toast.makeText(QACEService.this, String.valueOf(f[2]), Toast.LENGTH_SHORT).show();
+                    float[] f = b.getFloatArray("pong-data");
+                    boolean isCheating = model.detectCheat(model.createFloatTensor(f));
+                    Message reply = Message.obtain(null, MSG_INFERENCE, f.length, 0);
+//                    Toast.makeText(QACEService.this, String.valueOf(f[2]), Toast.LENGTH_SHORT).show();
+                    if (isCheating)
+                        showNotification("Cheating detected!");
+                    else
+                        showNotification("Normal behaviour");
                     try {
                         replyTo.send(reply);
                     } catch (RemoteException e) {
