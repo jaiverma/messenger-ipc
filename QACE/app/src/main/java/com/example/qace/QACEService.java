@@ -8,16 +8,20 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.Parcel;
 import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class QACEService extends Service {
@@ -42,19 +46,17 @@ public class QACEService extends Service {
     @Override
     public void onDestroy() {
         mNM.cancel(mNotificationId);
-        Log.i("hathi", "onDestroy");
+        model.deInit();
         Toast.makeText(this, "onDestroy", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.i("hathi", "onBind");
         Toast.makeText(QACEService.this, "onBind", Toast.LENGTH_SHORT).show();
         return mMessenger.getBinder();
     }
 
     private void showNotification(CharSequence title) {
-        Log.i("hathi", title.toString());
         // In this sample, we'll use the same text for the ticker and the expanded notification
         CharSequence text = "QACE";
 
@@ -83,11 +85,11 @@ public class QACEService extends Service {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_SAY_HELLO:
-                    Log.i("hathi", "MSG_SAY_HELLO");
-                    Toast.makeText(QACEService.this, "Hello World", Toast.LENGTH_SHORT).show();
                     Messenger replyTo = msg.replyTo;
-                    randNum = randGen.nextInt(1000);
-                    Message reply = Message.obtain(null, MSG_SAY_HELLO, randNum, 0);
+                    Bundle b = (Bundle)msg.obj;
+                    float[] f = b.getFloatArray("data-from-qace");
+                    Message reply = Message.obtain(null, MSG_SAY_HELLO, f.length, 0);
+                    Toast.makeText(QACEService.this, String.valueOf(f[2]), Toast.LENGTH_SHORT).show();
                     try {
                         replyTo.send(reply);
                     } catch (RemoteException e) {

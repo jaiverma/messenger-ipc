@@ -26,7 +26,7 @@ public class Model extends ContextWrapper {
     };
     EnumMap<MODEL, Integer> modelMap;
     private SNPE.NeuralNetworkBuilder builder;
-    private NeuralNetwork network;
+    private NeuralNetwork network = null;
 
     private void initModelMap() {
         modelMap = new EnumMap<MODEL, Integer>(MODEL.class);
@@ -36,23 +36,25 @@ public class Model extends ContextWrapper {
 
     public Model(Context base, MODEL m) {
         super(base);
-        Log.i("hathi", "" + this.getExternalFilesDir(null));
         initModelMap();
 
-//        AssetFileDescriptor fd = this.getResources().openRawResourceFd(R.raw.pong);
         try {
-//            InputStream dlc = fd.createInputStream();
-//            long size = fd.getLength();
             InputStream dlc = this.getResources().openRawResource(R.raw.pong);
             int size = dlc.available();
             builder = new SNPE.NeuralNetworkBuilder((Application)this.getApplicationContext())
                     .setRuntimeOrder(NeuralNetwork.Runtime.DSP, NeuralNetwork.Runtime.GPU, NeuralNetwork.Runtime.CPU)
                     .setModel(dlc, size);
             network = builder.build();
-            Log.i("hathi", "Created SNPE model");
+            Log.i("qace-snpe", "Created SNPE model");
             Toast.makeText(this, "Created SNPE model", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
-            Log.e("hathi", e.toString());
+            Log.e("qace-snpe", e.toString());
         }
+    }
+
+    public void deInit() {
+        if (network != null)
+            network.release();
+        Log.i("qace-snpe", "Release SNPE model");
     }
 }
