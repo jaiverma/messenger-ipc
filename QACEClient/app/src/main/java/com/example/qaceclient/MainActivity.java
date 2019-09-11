@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
     Messenger mService = null;
     boolean mIsBound ;
@@ -36,6 +38,21 @@ public class MainActivity extends AppCompatActivity {
                     super.handleMessage(msg);
             }
         }
+    }
+
+    private Bundle makeMessage() {
+        ArrayList<Float> data = new ArrayList<>(10);
+        for (int i = 0; i < 10; i++) {
+            data.add(i, (float)i / 3);
+        }
+        float[] d = new float[data.size()];
+        int i = 0;
+        for (Float f : data) {
+            d[i++] = f;
+        }
+        Bundle b = new Bundle();
+        b.putFloatArray("data-from-qace", d);
+        return b;
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -77,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Message msg = Message.obtain(null, MSG_SAY_HELLO);
                 msg.replyTo = mMessenger;
+                msg.obj = makeMessage();
                 mService.send(msg);
             } catch (RemoteException e) {
             }
